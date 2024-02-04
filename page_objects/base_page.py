@@ -38,6 +38,9 @@ class BasePage:
     def element_disappeared(self, locator: tuple, timeout=3):
         return WebDriverWait(self.browser, timeout).until(EC.invisibility_of_element(locator))
 
+    def get_element_property(self, element, property_name):
+        return element.get_property(property_name)
+
 
 
 

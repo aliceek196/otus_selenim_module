@@ -10,11 +10,15 @@ class CurrencyPage(BasePage):
     FIRST_ITEM_PRICE = (By.XPATH, "(//span[@class='price-new'])[1]")
 
     def currency_memorization(self):
-        self.get_element(self.FIRST_ITEM_PRICE).get_property("textContent")
+        first_item_price = self.scroll_and_get_element(self.FIRST_ITEM_PRICE)
+        price_text = self.get_element_property(first_item_price, "textContent")
+        return price_text
+
+    def change_currency_to_euro(self):
+        self.get_element(self.CURRENCY_BUTTON).click()
+        self.get_element(self.SELECT_EURO_CURRENCY_BUTTON).click()
         return self
 
-    def search_currency(self):
-        self.get_element(self.CURRENCY_BUTTON)
-        return self
+
 
 

@@ -1,4 +1,3 @@
-from page_objects.currency_change import CurrencyPage
 from page_objects.main_page import MainPage
 from page_objects.desktops_page import DesktopsPage
 from page_objects.tablet_samsung_page import TabletSamsungPage
@@ -7,12 +6,13 @@ from page_objects.registration_page import RegistrationPage
 
 
 def test_main_page_search(browser, base_url):
-    currency = CurrencyPage(browser, base_url)
     main = MainPage(browser, base_url)
-    currency.search_currency()
-    main.search_input()\
-        .search_button()\
-        .search_menu_tabs()
+    main.open_browser()
+    main.search_store_name()
+    main.search_input()
+    main.search_button()
+    main.search_menu_tabs()
+    main.search_cart_button()
 
 
 def test_desktops_page(browser, base_url):
@@ -40,7 +40,7 @@ def test_admin_page(browser, base_url):
     admin.open_admin()\
         .search_username()\
         .search_password()\
-        .login_button()
+        .search_login_button()
 
 
 def test_registration_page(browser, base_url):

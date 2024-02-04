@@ -5,13 +5,18 @@ from page_objects.base_page import BasePage
 class MainPage(BasePage):
     SEARCH_INPUT = (By.XPATH, "//input[contains(@placeholder, 'Search')]")
     SEARCH_BUTTON = (By.XPATH, "//button[@class='btn btn-light btn-lg']")
-    CART_BUTTON = (By.CLASS_NAME, "btn btn-inverse btn-block dropdown-toggle")
+    CART_BUTTON = (By.XPATH, "//button[@class='btn btn-lg btn-inverse btn-block dropdown-toggle']")
     MENU_TABS = (By.ID, "menu")
     ADD_FIRST_ITEM_TO_CART_BUTTON = (By.XPATH, "(//i[@class='fa-solid fa-shopping-cart'])[1]")
     CHECK_FIRST_ITEM_IN_CART = (By.XPATH, "//button[contains(text(),' 1 item(s) - $')]")
     EURO_CURRENCY = (By.XPATH, "//*[text()='€']")
     SELECT_EURO_CURRENCY_BUTTON = (By.XPATH, "//*[text()='€ Euro']")
     DOLLAR_CURRENCY = (By.XPATH, "//*[text()='$']")
+    STORE_NAME = (By.CSS_SELECTOR, "img[alt='Your Store']")
+
+    def search_store_name(self):
+        self.get_element(self.STORE_NAME)
+        return self
 
     def search_button(self):
         self.get_element(self.SEARCH_BUTTON)
@@ -23,6 +28,10 @@ class MainPage(BasePage):
 
     def search_menu_tabs(self):
         self.get_element(self.MENU_TABS)
+        return self
+
+    def search_cart_button(self):
+        self.get_element(self.CART_BUTTON)
         return self
 
     def add_first_item_to_cart(self):
