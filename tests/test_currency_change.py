@@ -1,7 +1,9 @@
 import pytest
 from page_objects.currency_change import CurrencyPage
+from allure import title
 
 
+@title("Checking currency switching")
 @pytest.mark.parametrize("page", ["", "/en-gb/catalog/desktops"])
 def test_currency_change(browser, base_url, page):
     currency = CurrencyPage(browser, base_url + page)

@@ -3,8 +3,10 @@ from page_objects.desktops_page import DesktopsPage
 from page_objects.tablet_samsung_page import TabletSamsungPage
 from page_objects.admin_page import AdminPage
 from page_objects.registration_page import RegistrationPage
+from allure import title
 
 
+@title("Checking the availability of elements on the main page")
 def test_main_page_search(browser, base_url):
     main = MainPage(browser, base_url)
     main.open_browser()
@@ -15,6 +17,7 @@ def test_main_page_search(browser, base_url):
     main.search_cart_button()
 
 
+@title("Checking the availability of elements on the Desktops page")
 def test_desktops_page(browser, base_url):
     desktops = DesktopsPage(browser, base_url)
     desktops.open_desktops()\
@@ -25,6 +28,7 @@ def test_desktops_page(browser, base_url):
         .search_list_view()
 
 
+@title("Checking the availability of elements on the Samsung Tablet page")
 def test_tablet_samsung_page(browser, base_url):
     tablet_samsung = TabletSamsungPage(browser, base_url)
     tablet_samsung.open_tablet_samsung()\
@@ -35,6 +39,7 @@ def test_tablet_samsung_page(browser, base_url):
         .search_wish_list_button()
 
 
+@title("Checking the availability of elements on the admin page")
 def test_admin_page(browser, base_url):
     admin = AdminPage(browser, base_url)
     admin.open_admin()\
@@ -43,6 +48,7 @@ def test_admin_page(browser, base_url):
         .search_login_button()
 
 
+@title("Checking the availability of elements on the registration page")
 def test_registration_page(browser, base_url):
     registration = RegistrationPage(browser, base_url)
     registration.open_registration_page()\

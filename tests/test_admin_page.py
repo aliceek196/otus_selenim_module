@@ -1,5 +1,6 @@
 import configparser
 from page_objects.admin_page import AdminPage
+from allure import title
 
 config = configparser.ConfigParser()
 config.read('config.ini')
@@ -9,6 +10,7 @@ username = config['Credentials']['admin_username']
 password = config['Credentials']['admin_password']
 
 
+@title("Check login to the admin area")
 def test_login_admin_page(browser, base_url):
     admin = AdminPage(browser, base_url)
     admin.open_admin()
@@ -18,6 +20,7 @@ def test_login_admin_page(browser, base_url):
     admin.logout()
 
 
+@title("Checking adding a product in the admin")
 def test_add_item_in_admin(browser, base_url):
     admin = AdminPage(browser, base_url)
     admin.open_admin()
@@ -36,6 +39,7 @@ def test_add_item_in_admin(browser, base_url):
     admin.success_alert_appears()
 
 
+@title("Checking deletion of product from admin")
 def test_delete_item_in_admin(browser, base_url):
     admin = AdminPage(browser, base_url)
     admin.open_admin()
