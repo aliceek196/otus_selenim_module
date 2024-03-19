@@ -1,6 +1,8 @@
 from page_objects.registration_page import RegistrationPage
+from allure import title
 
 
+@title("Checking the registration of a new user")
 def test_register_new_user(browser, base_url):
     registration = RegistrationPage(browser, base_url)
     registration.open_registration_page()
