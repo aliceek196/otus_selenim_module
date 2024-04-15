@@ -11,6 +11,8 @@ class BasePage:
     def __init__(self, browser, base_url):
         self.browser = browser
         self.base_url = base_url
+        self.logger = browser.logger
+        self.class_name = type(self).__name__
 
     def open_browser(self):
         self.browser.logger.info("Go to url: {}".format(self.base_url))
@@ -82,4 +84,3 @@ class BasePage:
 
     def get_element_property(self, element, property_name):
         return element.get_property(property_name)
-

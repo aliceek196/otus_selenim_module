@@ -15,7 +15,7 @@ def pytest_addoption(parser):
                      default=os.path.expanduser("C:/drivers/"),
                      help="Path to drivers")
     parser.addoption("--base_url")
-    parser.addoption("--log_level", action="store", default="DEBUG")
+    parser.addoption("--log_level", action="store", default="INFO")
     parser.addoption("--executor", action="store", default="93.183.72.83")
     parser.addoption("--bv", action="store", default="105.0")
     parser.addoption("--vnc", action="store_true", default=True)
@@ -38,13 +38,11 @@ def browser(request, base_url, _browser=None):
     logs = request.config.getoption("--logs")
 
     logger = logging.getLogger(request.node.name)
-    file_handler = logging.FileHandler(f"{request.node.name}.log")
-    file_handler.setFormatter(logging.Formatter(
-        '%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
+    file_handler = logging.FileHandler(f"logs/{request.node.name}.log")
+    file_handler.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
     logger.addHandler(file_handler)
     logger.setLevel(level=log_level)
-    logger.info("===> Test {} started at {}".format(request.node.name,
-                                                    datetime.datetime.now()))
+    logger.info("===> Test %s started at %s" % (request.node.name, datetime.datetime.now()))
 
     if executor == "localhost":
         capabilities = {'goog:chromeOptions': {}}
@@ -79,6 +77,12 @@ def browser(request, base_url, _browser=None):
         driver.log_level = log_level
         driver.logger = logger
         driver.test_name = request.node.name
+
+        logger.info("Browser %s started" % browser)
+
+        # def fin():
+        #     driver.quit()
+        #     logger.info("===> Test %s finished at %s" % (request.node.name, datetime.datetime.now()))
 
         _browser.maximize_window()
 
