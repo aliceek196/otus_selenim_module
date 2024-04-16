@@ -7,6 +7,7 @@ from selenium import webdriver
 from selenium.webdriver.chrome.service import Service as ChromeService
 from selenium.webdriver.firefox.service import Service as FirefoxService
 from selenium.webdriver.edge.service import Service as EdgeService
+from selenium.webdriver.support.events import EventFiringWebDriver, AbstractEventListener
 
 
 def pytest_addoption(parser):
@@ -32,9 +33,9 @@ def browser(request, base_url, _browser=None):
     browser_name = request.config.getoption("--browser")
     drivers = request.config.getoption("--drivers")
     log_level = request.config.getoption("--log_level")
-    executor = request.config.getoption("--executor")
-    version = request.config.getoption("--bv")
-    vnc = request.config.getoption("--vnc")
+    # executor = request.config.getoption("--executor")
+    # version = request.config.getoption("--bv")
+    # vnc = request.config.getoption("--vnc")
     logs = request.config.getoption("--logs")
 
     logger = logging.getLogger(request.node.name)
@@ -58,31 +59,27 @@ def browser(request, base_url, _browser=None):
             _browser = webdriver.Edge(service=service)
         else:
             raise ValueError(f"Browser {browser_name} is not supported.")
-    else:
-        executor_url = f"http://{executor}:4444/wd/hub"
+    # else:
+    #     executor_url = f"http://{executor}:4444/wd/hub"
 
-        capabilities = {
-            "browserName": browser_name,
-            "browserVersion": version,
-            "name": "test_opencart",
-            "selenoid:options": {
-                "sessionTimeout": "60s",
-                "enableVNC": vnc,
-                "enableLog": logs
-            }
-        }
+        # capabilities = {
+        #     "browserName": browser_name,
+        #     "browserVersion": version,
+        #     "name": "test_opencart",
+        #     "selenoid:options": {
+        #         "sessionTimeout": "60s",
+        #         "enableVNC": vnc,
+        #         "enableLog": logs
+        #     }
+        # }
+        #
+        # _browser = webdriver.Remote(command_executor=executor_url, desired_capabilities=capabilities)
 
-        driver = webdriver.Remote(command_executor=executor_url, desired_capabilities=capabilities)
-
-        driver.log_level = log_level
-        driver.logger = logger
-        driver.test_name = request.node.name
+        _browser.log_level = log_level
+        _browser.logger = logger
+        _browser.test_name = request.node.name
 
         logger.info("Browser %s started" % browser)
-
-        # def fin():
-        #     driver.quit()
-        #     logger.info("===> Test %s finished at %s" % (request.node.name, datetime.datetime.now()))
 
         _browser.maximize_window()
 
