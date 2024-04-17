@@ -12,12 +12,12 @@ from selenium.webdriver.support.events import EventFiringWebDriver, AbstractEven
 
 def pytest_addoption(parser):
     parser.addoption("--browser")
-    parser.addoption("--drivers", action="store",
-                     default=os.path.expanduser("C:/drivers/"),
-                     help="Path to drivers")
+    # parser.addoption("--drivers", action="store",
+    #                  default=os.path.expanduser("C:/drivers/"),
+    #                  help="Path to drivers")
     parser.addoption("--base_url")
     parser.addoption("--log_level", action="store", default="INFO")
-    parser.addoption("--executor", action="store", default="93.183.72.83")
+    parser.addoption("--executor", action="store", default="10.33.110.15")
     parser.addoption("--bv", action="store", default="105.0")
     parser.addoption("--vnc", action="store_true", default=True)
     parser.addoption("--logs", action="store_true")
@@ -33,7 +33,8 @@ def browser(request, base_url, _browser=None):
     browser_name = request.config.getoption("--browser")
     drivers = request.config.getoption("--drivers")
     log_level = request.config.getoption("--log_level")
-    # executor = request.config.getoption("--executor")
+    executor = request.config.getoption("--executor")
+    executor_url = f"http://{executor}:4444/ws/hub"
     # version = request.config.getoption("--bv")
     # vnc = request.config.getoption("--vnc")
     logs = request.config.getoption("--logs")
@@ -45,20 +46,25 @@ def browser(request, base_url, _browser=None):
     logger.setLevel(level=log_level)
     logger.info("===> Test %s started at %s" % (request.node.name, datetime.datetime.now()))
 
-    if executor == "localhost":
-        capabilities = {'goog:chromeOptions': {}}
+    # if executor == "localhost":
+    #     capabilities = {'goog:chromeOptions': {}}
 
-        if browser_name == "chrome":
-            service = ChromeService(executable_path=drivers + "/chromedriver")
-            _browser = webdriver.Chrome(service=service)
-        elif browser_name == "firefox":
-            service = FirefoxService(executable_path=drivers + "/geckodriver")
-            _browser = webdriver.Firefox(service=service)
-        elif browser_name == "edge":
-            service = EdgeService(executable_path=drivers + "/msedgedriver")
-            _browser = webdriver.Edge(service=service)
-        else:
-            raise ValueError(f"Browser {browser_name} is not supported.")
+    if browser_name == "chrome":
+        options = ChromeOptions()
+        # _browser = webdriver.Chrome(service=service)
+    elif browser_name == "firefox":
+        options = FirefoxOptions()
+        # _browser = webdriver.Firefox(service=service)
+    # elif browser_name == "edge":
+    #     service = EdgeService(executable_path=drivers + "/msedgedriver")
+    #     _browser = webdriver.Edge(service=service)
+    else:
+        raise ValueError(f"Browser {browser_name} is not supported.")
+
+    driver = webdriver.Remote(
+        command_executor=executor_url,
+        options=options
+    )
     # else:
     #     executor_url = f"http://{executor}:4444/wd/hub"
 
@@ -75,13 +81,13 @@ def browser(request, base_url, _browser=None):
         #
         # _browser = webdriver.Remote(command_executor=executor_url, desired_capabilities=capabilities)
 
-        _browser.log_level = log_level
-        _browser.logger = logger
-        _browser.test_name = request.node.name
+        # _browser.log_level = log_level
+        # _browser.logger = logger
+        # _browser.test_name = request.node.name
 
-        logger.info("Browser %s started" % browser)
+        # logger.info("Browser %s started" % browser)
 
-        _browser.maximize_window()
+        # _browser.maximize_window()
 
     yield _browser
 
