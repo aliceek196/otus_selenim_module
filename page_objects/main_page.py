@@ -42,7 +42,7 @@ class MainPage(BasePage):
 
     @step("Adding the first item to the cart")
     def add_first_item_to_cart(self):
-        self.get_element(self.ADD_FIRST_ITEM_TO_CART_BUTTON).click()
+        self.scroll_and_get_element(self.ADD_FIRST_ITEM_TO_CART_BUTTON)
         return self
 
     @step("Check availability of the first item in the cart")

@@ -13,40 +13,16 @@ class BasePage:
         self.base_url = base_url
 
     def open_browser(self):
-        self.browser.logger.info("Go to url: {}".format(self.base_url))
         self.browser.get(self.base_url)
 
-    def get_element(self, locator: tuple, timeout=3):
-        self.browser.logger.info(
-            "Find element: {}".format(locator))
-        try:
-            element = WebDriverWait(self.browser, timeout).until(EC.visibility_of_element_located(locator))
-        except TimeoutException:
-            raise allure.attach(self.browser.get_screenshot_as_png(),
-                                name="screenshot",
-                                attachment_type=AttachmentType.PNG)
-        return element
+    def get_element(self, locator: tuple, timeout=5):
+        return WebDriverWait(self.browser, timeout).until(EC.visibility_of_element_located(locator))
 
-    def get_elements(self, locator: tuple, timeout=3):
-        self.browser.logger.info(
-            "Find elements: {}".format(locator))
-        try:
-            elements = WebDriverWait(self.browser, timeout).until(EC.visibility_of_all_elements_located(locator))
-        except TimeoutException:
-            raise allure.attach(self.browser.get_screenshot_as_png(),
-                                name="screenshot",
-                                attachment_type=AttachmentType.PNG)
-        return elements
+    def get_elements(self, locator: tuple, timeout=5):
+        return WebDriverWait(self.browser, timeout).until(EC.visibility_of_all_elements_located(locator))
 
     def click(self, locator: tuple):
-        self.browser.logger.info(
-            "Click on element: {}".format(locator))
-        try:
-            ActionChains(self.browser).move_to_element(self.get_element(locator)).pause(0.3).click().perform()
-        except ElementNotInteractableException:
-            raise allure.attach(self.browser.get_screenshot_as_png(),
-                                name="screenshot",
-                                attachment_type=AttachmentType.PNG)
+        ActionChains(self.browser).move_to_element(self.get_element(locator)).pause(0.3).click().perform()
 
     def input_value(self, locator: tuple, text: str):
         self.get_element(locator).click()
@@ -58,27 +34,12 @@ class BasePage:
         self.browser.execute_script("arguments[0].click();", locator)
 
     def scroll_and_get_element(self, locator: tuple, timeout=3):
-        self.browser.logger.info(
-            "Scroll to element: {}".format(locator))
-        try:
-            element = WebDriverWait(self.browser, timeout).until(EC.visibility_of_element_located(locator))
-            self.scroll_into_view(element)
-        except TimeoutException:
-            raise allure.attach(self.browser.get_screenshot_as_png(),
-                                name="screenshot",
-                                attachment_type=AttachmentType.PNG)
+        element = WebDriverWait(self.browser, timeout).until(EC.visibility_of_element_located(locator))
+        self.scroll_into_view(element)
         return element
 
     def element_disappeared(self, locator: tuple, timeout=3):
-        self.browser.logger.info(
-            "Waiting for disappeared element: {}".format(locator))
-        try:
-            element = WebDriverWait(self.browser, timeout).until(EC.invisibility_of_element(locator))
-        except TimeoutException:
-            raise allure.attach(self.browser.get_screenshot_as_png(),
-                                name="screenshot",
-                                attachment_type=AttachmentType.PNG)
-        return element
+        return WebDriverWait(self.browser, timeout).until(EC.invisibility_of_element(locator))
 
     def get_element_property(self, element, property_name):
         return element.get_property(property_name)

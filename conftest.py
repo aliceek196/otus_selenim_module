@@ -1,87 +1,85 @@
-import os
-
-import pytest
-import logging
 import datetime
+import logging
+import pytest
 from selenium import webdriver
-from selenium.webdriver.chrome.service import Service as ChromeService
-from selenium.webdriver.firefox.service import Service as FirefoxService
-from selenium.webdriver.edge.service import Service as EdgeService
+# from selenium.webdriver.chrome.service import Service as ChromeService
+from selenium.webdriver.chrome.options import Options as ChromeOptions
+from selenium.webdriver.firefox.options import Options as FirefoxOptions
+
+
+# from selenium.webdriver.firefox.service import Service as FirefoxService
+# from selenium.webdriver.edge.service import Service as EdgeService
 
 
 def pytest_addoption(parser):
-    parser.addoption("--browser")
-    parser.addoption("--drivers", action="store",
-                     default=os.path.expanduser("C:/drivers/"),
-                     help="Path to drivers")
-    parser.addoption("--base_url")
-    parser.addoption("--log_level", action="store", default="DEBUG")
-    parser.addoption("--executor", action="store", default="93.183.72.83")
-    parser.addoption("--bv", action="store", default="105.0")
-    parser.addoption("--vnc", action="store_true", default=True)
+    parser.addoption("--browser", action="store", default="chrome")
+    parser.addoption("--base_url", action="store")
+    parser.addoption("--executor", action="store")
     parser.addoption("--logs", action="store_true")
+    parser.addoption("--log_level", action="store", default="DEBUG")
+    parser.addoption("--bv")
 
-
+#
 @pytest.fixture(scope="session")
 def base_url(request):
     return request.config.getoption("--base_url")
 
 
 @pytest.fixture
-def browser(request, base_url, _browser=None):
-    browser_name = request.config.getoption("--browser")
-    drivers = request.config.getoption("--drivers")
-    log_level = request.config.getoption("--log_level")
+def browser(request):
+    browser = request.config.getoption("--browser")
     executor = request.config.getoption("--executor")
-    version = request.config.getoption("--bv")
-    vnc = request.config.getoption("--vnc")
     logs = request.config.getoption("--logs")
+    log_level = request.config.getoption("--log_level")
+    version = request.config.getoption("--bv")
 
     logger = logging.getLogger(request.node.name)
-    file_handler = logging.FileHandler(f"{request.node.name}.log")
-    file_handler.setFormatter(logging.Formatter(
-        '%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
+    file_handler = logging.FileHandler(f'{__name__}.log')
+    file_handler.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
     logger.addHandler(file_handler)
     logger.setLevel(level=log_level)
-    logger.info("===> Test {} started at {}".format(request.node.name,
-                                                    datetime.datetime.now()))
 
-    if executor == "localhost":
-        capabilities = {'goog:chromeOptions': {}}
+    logger.info("===> Test {} started at {}".format(request.node.name, datetime.datetime.now()))
 
-        if browser_name == "chrome":
-            service = ChromeService(executable_path=drivers + "/chromedriver")
-            _browser = webdriver.Chrome(service=service)
-        elif browser_name == "firefox":
-            service = FirefoxService(executable_path=drivers + "/geckodriver")
-            _browser = webdriver.Firefox(service=service)
-        elif browser_name == "edge":
-            service = EdgeService(executable_path=drivers + "/msedgedriver")
-            _browser = webdriver.Edge(service=service)
-        else:
-            raise ValueError(f"Browser {browser_name} is not supported.")
-    else:
-        executor_url = f"http://{executor}:4444/wd/hub"
+    executor_url = f"http://{executor}:4444/wd/hub"
 
-        capabilities = {
-            "browserName": browser_name,
-            "browserVersion": version,
-            "name": "test_opencart",
-            "selenoid:options": {
-                "sessionTimeout": "60s",
-                "enableVNC": vnc,
-                "enableLog": logs
-            }
-        }
+    if browser == "chrome":
+        options = ChromeOptions()
+    elif browser == "firefox":
+        options = FirefoxOptions()
 
-        driver = webdriver.Remote(command_executor=executor_url, desired_capabilities=capabilities)
+    caps = {
+        "browserName": browser,
+        "browserVersion": version,
+        # "selenoid:options": {
+        #     "enableVNC": vnc,
+        #     "name": os.getenv("BUILD_NUMBER", str(random.randint(9000, 10000))),
+        #     "screenResolution": "1280x2000",
+        #     "enableVideo": video,
+        #     "enableLog": logs,
+        #     "timeZone": "Europe/Moscow",
+        #     "env": ["LANG=ru_RU.UTF-8", "LANGUAGE=ru:en", "LC_ALL=ru_RU.UTF-8"]
 
-        driver.log_level = log_level
-        driver.logger = logger
-        driver.test_name = request.node.name
+    }
 
-        _browser.maximize_window()
+    for k, v in caps.items():
+        options.set_capability(k, v)
 
-    yield _browser
+    driver = webdriver.Remote(
+        command_executor=executor_url,
+        options=options
+    )
+    # driver.log_level = log_level
+    # driver.logger = logger
+    # driver.test_name = request.node.name
 
-    _browser.close()
+    driver.maximize_window()
+
+    def fin():
+        driver.quit()
+        # requests.delete(f'http://{executor}:4444/wd/hub/session/{driver.session_id}', verify=False)
+        logger.info("===> Test {} finished at {}".format(request.node.name, datetime.datetime.now()))
+
+    request.addfinalizer(fin)
+
+    return driver
