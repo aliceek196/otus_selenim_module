@@ -16,7 +16,7 @@ def pytest_addoption(parser):
     parser.addoption("--base_url", action="store")
     parser.addoption("--executor", action="store")
     parser.addoption("--logs", action="store_true")
-    parser.addoption("--log_level", action="store", default="DEBUG")
+    parser.addoption("--log_level", action="store", default="INFO")
     parser.addoption("--bv")
 
 #
